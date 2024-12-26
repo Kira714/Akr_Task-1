@@ -3,19 +3,23 @@ const bodyParser = require("body-parser");
 const mysql = require("mysql");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 
+// JWT secret key
+const JWT_SECRET = "your-secure-jwt-secret"; // Replace with an environment variable in production
+
 // Middleware
-app.use(cors());  // Enable CORS for all origins
-app.use(bodyParser.json());  // Parse incoming JSON requests
+app.use(cors()); // Enable CORS for all origins
+app.use(bodyParser.json()); // Parse incoming JSON requests
 
 // MySQL Connection
 const db = mysql.createConnection({
     host: "localhost", // Replace with your MySQL server host
-    user: "root",      // Replace with your MySQL username
-    password: "root",  // Replace with your MySQL password
-    database: "test_1" // Replace with your MySQL database name
+    user: "root", // Replace with your MySQL username
+    password: "root", // Replace with your MySQL password
+    database: "test_1", // Replace with your MySQL database name
 });
 
 db.connect((err) => {
@@ -37,12 +41,12 @@ db.query(
         gender VARCHAR(10),
         password VARCHAR(100)
     )`,
-    (err, result) => {
+    (err) => {
         if (err) console.error("Error creating table:", err);
     }
 );
 
-// API to handle form submission (User Registration)
+// API to handle user registration
 app.post("/register", (req, res) => {
     const { firstname, lastname, email, mobile, gender, password } = req.body;
 
@@ -60,7 +64,7 @@ app.post("/register", (req, res) => {
 
         // Insert user into the database with hashed password
         const sql = `INSERT INTO users (firstname, lastname, email, mobile, gender, password) VALUES (?, ?, ?, ?, ?, ?)`;
-        db.query(sql, [firstname, lastname, email, mobile, gender, hashedPassword], (err, result) => {
+        db.query(sql, [firstname, lastname, email, mobile, gender, hashedPassword], (err) => {
             if (err) {
                 console.error("Error inserting user:", err);
                 if (err.code === "ER_DUP_ENTRY") {
@@ -74,7 +78,7 @@ app.post("/register", (req, res) => {
     });
 });
 
-// API to handle user login (with password comparison)
+// API to handle user login with JWT generation
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
 
@@ -106,8 +110,57 @@ app.post("/login", (req, res) => {
                 return res.status(401).json({ error: "Invalid credentials!" });
             }
 
-            // Passwords match, return successful login
-            res.status(200).json({ message: "Login successful!", user: result[0] });
+            // Generate JWT token
+            const token = jwt.sign({ id: result[0].id, email: result[0].email }, JWT_SECRET, { expiresIn: "1h" });
+
+            res.status(200).json({
+                message: "Login successful!",
+                token,
+                user: {
+                    id: result[0].id,
+                    firstname: result[0].firstname,
+                    lastname: result[0].lastname,
+                    email: result[0].email,
+                },
+            });
+        });
+    });
+});
+
+// Middleware to verify JWT token
+const verifyToken = (req, res, next) => {
+    const token = req.headers["authorization"];
+    if (!token) {
+        return res.status(401).json({ error: "Access denied, token missing!" });
+    }
+
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(401).json({ error: "Invalid or expired token!" });
+        }
+        req.user = decoded; // Attach user details from token to the request object
+        next();
+    });
+};
+
+// Protected route to fetch user profile
+app.get("/profile", verifyToken, (req, res) => {
+    const userId = req.user.id;
+
+    const sql = `SELECT id, firstname, lastname, email, mobile, gender FROM users WHERE id = ?`;
+    db.query(sql, [userId], (err, result) => {
+        if (err) {
+            console.error("Error fetching user profile:", err);
+            return res.status(500).json({ error: "Database error!" });
+        }
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: "User not found!" });
+        }
+
+        res.status(200).json({
+            message: "User profile fetched successfully!",
+            user: result[0],
         });
     });
 });
