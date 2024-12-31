@@ -1,3 +1,7 @@
+Here's a basic registration and login page interface implemented.
+Technologies and Concepts used:-
+->
+
 ![image](https://github.com/user-attachments/assets/a3de5611-1220-4312-bfcd-c896bf7ec3db)
 ![image](https://github.com/user-attachments/assets/5af1abcd-049b-404a-8ca5-f12d6e9814a3)
 ![image](https://github.com/user-attachments/assets/6f9c6fc9-70ea-4e27-bfa4-e70f4e7b7dfb)
