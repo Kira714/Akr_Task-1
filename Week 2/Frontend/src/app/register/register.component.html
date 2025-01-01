@@ -1,0 +1,108 @@
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="border p-3 rounded-3">
+  <div class="row g-0">
+    <div class="col text-center p-2 mb-3 bg-light">
+      <span class="fs-3">Register</span>
+    </div>
+  </div>
+
+  <!-- First Name -->
+  <div class="row">
+    <div class="col">
+      <label for="firstname" class="form-label">First Name</label>
+      <input type="text" class="form-control" id="firstname" formControlName="firstname">
+      <div class="form-text text-danger" *ngIf="firstname.errors?.['required'] && firstname.touched">
+        First Name is required.
+      </div>
+      <div class="form-text text-danger" *ngIf="firstname.errors?.['minlength'] && firstname.touched">
+        First Name must be at least 2 characters long.
+      </div>
+    </div>
+
+    <!-- Last Name -->
+    <div class="col">
+      <label for="lastname" class="form-label">Last Name</label>
+      <input type="text" class="form-control" id="lastname" formControlName="lastname">
+      <div class="form-text text-danger" *ngIf="lastname.errors?.['required'] && lastname.touched">
+        Last Name is required.
+      </div>
+      <div class="form-text text-danger" *ngIf="lastname.errors?.['minlength'] && lastname.touched">
+        Last Name must be at least 2 characters long.
+      </div>
+    </div>
+  </div>
+
+  <!-- Email -->
+  <div class="row">
+    <div class="col mb-3">
+      <label for="email" class="form-label">E-Mail Address</label>
+      <input type="email" class="form-control" id="email" formControlName="email">
+      <div class="form-text text-danger" *ngIf="email.errors?.['required'] && email.touched">
+        Email is required.
+      </div>
+      <div class="form-text text-danger" *ngIf="email.errors?.['email'] && email.touched">
+        Please enter a valid email address.
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile -->
+  <div class="row">
+    <div class="col mb-3">
+      <label for="mobile" class="form-label">Mobile</label>
+      <input type="text" class="form-control" id="mobile" formControlName="mobile">
+      <div class="form-text text-danger" *ngIf="mobile.errors?.['required'] && mobile.touched">
+        Mobile number is required.
+      </div>
+      <div class="form-text text-danger" *ngIf="mobile.errors?.['pattern'] && mobile.touched">
+        Mobile number must be 10 digits long.
+      </div>
+    </div>
+  </div>
+
+  <!-- Gender -->
+  <div class="row mb-3">
+    <div class="col">
+      <div class="m-1">Gender</div>
+      <div class="form-check form-check-inline">
+        <input type="radio" id="male" name="gender" class="form-check-input" formControlName="gender" value="male">
+        <label for="male" class="form-check-label">Male</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input type="radio" id="female" name="gender" class="form-check-input" formControlName="gender" value="female">
+        <label for="female" class="form-check-label">Female</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input type="radio" id="other" name="gender" class="form-check-input" formControlName="gender" value="other">
+        <label for="other" class="form-check-label">Other</label>
+      </div>
+      <div class="form-text text-danger" *ngIf="gender.errors?.['required'] && gender.touched">
+        Please select a gender.
+      </div>
+    </div>
+  </div>
+
+  <!-- Password -->
+  <div class="row">
+    <div class="col mb-3">
+      <label for="password" class="form-label">Password</label>
+      <input type="password" class="form-control" id="password" formControlName="password">
+      <div class="form-text text-danger" *ngIf="password.errors?.['required'] && password.touched">
+        Password is required.
+      </div>
+      <div class="form-text text-danger" *ngIf="password.errors?.['minlength'] && password.touched">
+        Password must be at least 8 characters long.
+      </div>
+      <div class="form-text text-danger" *ngIf="password.errors?.['pattern'] && password.touched">
+        Password must include an uppercase letter, a lowercase letter, a number, and a special character.
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit Button -->
+  <div class="row">
+    <div class="col text-center">
+      <button type="submit" class="btn btn-primary">Submit</button>
+      <button type="button" class="btn btn-link" routerLink="/login">Login</button>
+    </div>
+  </div>
+</form>
